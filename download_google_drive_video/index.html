@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Extract Video URLs by Quality</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    
+    .header p {
+      opacity: 0.9;
+      font-size: 14px;
+    }
+    
+    .content {
+      padding: 30px;
+    }
+    
+    .input-section {
+      margin-bottom: 24px;
+    }
+    
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+      font-size: 14px;
+    }
+    
+    textarea { 
+      width: 100%;
+      height: 180px;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      resize: vertical;
+      transition: border-color 0.3s;
+    }
+    
+    textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      flex: 1;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+      background: #f5f5f5;
+      color: #666;
+    }
+    
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+    
+    .video-title-section {
+      background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      color: white;
+    }
+    
+    .video-title-label {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      opacity: 0.95;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .title-display {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+    
+    .title-input {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      background: rgba(255,255,255,0.95);
+      color: #333;
+    }
+    
+    .btn-copy-title {
+      padding: 12px 24px;
+      background: rgba(255,255,255,0.25);
+      color: white;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+    
+    .btn-copy-title:hover {
+      background: rgba(255,255,255,0.35);
+      border-color: rgba(255,255,255,0.6);
+      transform: translateY(-2px);
+    }
+    
+    .instruction-box {
+      background: #fff3cd;
+      border: 2px solid #ffc107;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .instruction-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #856404;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .instruction-steps {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .instruction-steps li {
+      padding: 8px 0 8px 28px;
+      color: #856404;
+      position: relative;
+      line-height: 1.5;
+    }
+    
+    .instruction-steps li:before {
+      content: attr(data-step);
+      position: absolute;
+      left: 0;
+      top: 8px;
+      background: #ffc107;
+      color: white;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    
+    .instruction-steps strong {
+      color: #664d03;
+    }
+    
+    .results {
+      margin-top: 32px;
+    }
+    
+    .results-header {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .quality-card {
+      background: #f8f9fa;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      transition: all 0.3s;
+    }
+    
+    .quality-card:hover {
+      border-color: #667eea;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .quality-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .quality-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    
+    .badge-360 { background: #e3f2fd; color: #1976d2; }
+    .badge-480 { background: #f3e5f5; color: #7b1fa2; }
+    .badge-720 { background: #fff3e0; color: #e65100; }
+    .badge-1080 { background: #e8f5e9; color: #2e7d32; }
+    
+    .quality-info {
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .url-display {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    
+    .url-input {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: 'Courier New', monospace;
+      background: white;
+    }
+    
+    .btn-action {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+    
+    .btn-copy {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-copy:hover {
+      background: #5568d3;
+    }
+    
+    .btn-download {
+      background: #2e7d32;
+      color: white;
+    }
+    
+    .btn-download:hover {
+      background: #1b5e20;
+    }
+    
+    .status {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      text-align: center;
+      font-weight: 500;
+    }
+    
+    .status-success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #a5d6a7;
+    }
+    
+    .status-error {
+      background: #ffebee;
+      color: #c62828;
+      border: 1px solid #ef9a9a;
+    }
+    
+    .status-info {
+      background: #e3f2fd;
+      color: #1976d2;
+      border: 1px solid #90caf9;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    @media (max-width: 640px) {
+      .url-display {
+        flex-direction: column;
+      }
+      
+      .btn-action {
+        width: 100%;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      .title-display {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎥 Video Quality Extractor</h1>
+      <p>Trích xuất URL video theo độ phân giải từ JSON</p>
+    </div>
+    
+    <div class="content">
+      <div class="input-section">
+        <label for="input">📋 Dán JSON vào đây:</label>
+        <textarea id="input" placeholder='Paste your JSON data here...'></textarea>
+        
+        <div class="button-group">
+          <button id="extract" class="btn-primary">🔍 Trích xuất</button>
+          <button id="clear" class="btn-secondary">🗑️ Xóa</button>
+        </div>
+      </div>
+      
+      <div id="status" class="status hidden"></div>
+      
+      <div id="videoTitleSection" class="video-title-section hidden">
+        <div class="video-title-label">
+          🎬 Tên Video (Copy để dùng khi lưu file)
+        </div>
+        <div class="title-display">
+          <input type="text" id="videoTitle" class="title-input" readonly />
+          <button id="copyTitle" class="btn-copy-title">📋 Copy Tên</button>
+        </div>
+      </div>
+      
+      <div id="instructionBox" class="instruction-box hidden">
+        <div class="instruction-title">
+          💡 Hướng dẫn lưu video với tên đúng
+        </div>
+        <ul class="instruction-steps">
+          <li data-step="1">Bấm nút <strong>"⬇️ Download"</strong> bên dưới (video sẽ mở trong tab mới)</li>
+          <li data-step="2">Nhấp chuột phải vào video đang phát → chọn <strong>"Lưu video dưới dạng..."</strong> hoặc <strong>"Save video as..."</strong></li>
+          <li data-step="3">Trong ô tên file, <strong>dán tên</strong> đã copy ở trên (Ctrl+V / Cmd+V)</li>
+          <li data-step="4">Thêm chất lượng vào cuối, ví dụ: <strong>"Tên_Video_1080p.mp4"</strong>(có thể bỏ qua bước này)</li>
+          <li data-step="5">Bấm <strong>"Lưu"</strong> và hoàn tất! 🎉</li>
+        </ul>
+      </div>
+      
+      <div id="results" class="results hidden">
+        <div class="results-header">
+          <span>📊 Kết quả tìm kiếm</span>
+        </div>
+        <div id="qualityCards"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (s) => document.querySelector(s);
+    const input = $("#input");
+    const resultsDiv = $("#results");
+    const qualityCards = $("#qualityCards");
+    const statusDiv = $("#status");
+    const videoTitleSection = $("#videoTitleSection");
+    const videoTitleInput = $("#videoTitle");
+    const instructionBox = $("#instructionBox");
+
+    let videoTitle = "";
+
+    // Mapping itag to quality
+    const qualityMap = {
+      18: { label: "360p", itag: 18, badge: "badge-360" },
+      22: { label: "720p", itag: 22, badge: "badge-720" },
+      37: { label: "1080p", itag: 37, badge: "badge-1080" },
+      59: { label: "480p", itag: 59, badge: "badge-480" }
+    };
+
+    function safeParse(str) {
+      try {
+        return JSON.parse(str.trim());
+      } catch { return null; }
+    }
+
+    function deepParseIfJsonString(val) {
+      if (typeof val === "string") {
+        const maybe = safeParse(val);
+        if (maybe && typeof maybe === "object") return maybe;
+      }
+      return val;
+    }
+
+    function findAllVideoUrls(root) {
+      const seen = new WeakSet();
+      const results = {};
+      videoTitle = "";
+      
+      function dfs(node) {
+        if (!node || typeof node !== "object") return;
+        if (seen.has(node)) return;
+        seen.add(node);
+
+        // Tìm mediaMetadata.title
+        if (!videoTitle && node.mediaMetadata && node.mediaMetadata.title) {
+          videoTitle = node.mediaMetadata.title;
+        }
+
+        if (typeof node.itag === "number" && typeof node.url === "string") {
+          if (qualityMap[node.itag]) {
+            results[node.itag] = node.url;
+          }
+        }
+
+        for (const key of Object.keys(node)) {
+          let val = node[key];
+          val = deepParseIfJsonString(val);
+
+          if (Array.isArray(val)) {
+            for (const item of val) {
+              const sub = deepParseIfJsonString(item);
+              if (typeof sub === "object") dfs(sub);
+            }
+          } else if (val && typeof val === "object") {
+            dfs(val);
+          }
+        }
+      }
+      
+      dfs(root);
+      return results;
+    }
+
+    function showStatus(message, type = "info") {
+      statusDiv.textContent = message;
+      statusDiv.className = `status status-${type}`;
+      statusDiv.classList.remove("hidden");
+    }
+
+    function hideStatus() {
+      statusDiv.classList.add("hidden");
+    }
+
+    function createQualityCard(itag, url) {
+      const quality = qualityMap[itag];
+      const card = document.createElement("div");
+      card.className = "quality-card";
+      
+      card.innerHTML = `
+        <div class="quality-header">
+          <span class="quality-badge ${quality.badge}">
+            📹 ${quality.label}
+          </span>
+          <span class="quality-info">itag: ${itag}</span>
+        </div>
+        <div class="url-display">
+          <input type="text" class="url-input" value="${url}" readonly />
+          <button class="btn-action btn-copy" data-url="${url}">📋 Copy URL</button>
+          <button class="btn-action btn-download" data-url="${url}" data-quality="${quality.label}">⬇️ Download</button>
+        </div>
+      `;
+      
+      return card;
+    }
+
+    async function copyToClipboard(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showStatus("✅ Đã copy vào clipboard!", "success");
+        setTimeout(hideStatus, 3000);
+      } catch {
+        showStatus("❌ Không thể copy. Vui lòng copy thủ công.", "error");
+      }
+    }
+
+    function downloadVideo(url, quality) {
+      window.open(url, '_blank');
+      showStatus(`🎬 Đã mở video ${quality}. Nhớ làm theo hướng dẫn để lưu đúng tên!`, "info");
+    }
+
+    function extract() {
+      qualityCards.innerHTML = "";
+      resultsDiv.classList.add("hidden");
+      videoTitleSection.classList.add("hidden");
+      instructionBox.classList.add("hidden");
+      hideStatus();
+
+      const raw = input.value;
+      if (!raw.trim()) {
+        showStatus("⚠️ Chưa có dữ liệu để xử lý.", "info");
+        return;
+      }
+
+      const json = safeParse(raw);
+      if (!json) {
+        showStatus("❌ Không parse được JSON. Hãy kiểm tra lại định dạng.", "error");
+        return;
+      }
+
+      const urls = findAllVideoUrls(json);
+      const foundItags = Object.keys(urls);
+
+      if (foundItags.length === 0) {
+        showStatus("⚠️ Không tìm thấy URL video nào.", "info");
+        return;
+      }
+
+      // Hiển thị tên video nếu tìm thấy
+      if (videoTitle) {
+        // Sanitize tên file
+        const cleanTitle = videoTitle.replace(/[<>:"/\\|?*]/g, '_');
+        videoTitleInput.value = cleanTitle;
+        videoTitleSection.classList.remove("hidden");
+        instructionBox.classList.remove("hidden");
+      }
+
+      // Sort by quality (1080p first)
+      const sortOrder = [37, 22, 59, 18];
+      foundItags.sort((a, b) => sortOrder.indexOf(+a) - sortOrder.indexOf(+b));
+
+      foundItags.forEach(itag => {
+        const card = createQualityCard(itag, urls[itag]);
+        qualityCards.appendChild(card);
+      });
+
+      resultsDiv.classList.remove("hidden");
+      showStatus(`✅ Đã tìm thấy ${foundItags.length} video chất lượng khác nhau!`, "success");
+      setTimeout(hideStatus, 3000);
+    }
+
+    // Event listeners
+    $("#extract").addEventListener("click", extract);
+    
+    $("#clear").addEventListener("click", () => {
+      input.value = "";
+      qualityCards.innerHTML = "";
+      resultsDiv.classList.add("hidden");
+      videoTitleSection.classList.add("hidden");
+      instructionBox.classList.add("hidden");
+      hideStatus();
+    });
+
+    $("#copyTitle").addEventListener("click", () => {
+      copyToClipboard(videoTitleInput.value);
+    });
+
+    qualityCards.addEventListener("click", (e) => {
+      if (e.target.classList.contains("btn-copy")) {
+        copyToClipboard(e.target.dataset.url);
+      } else if (e.target.classList.contains("btn-download")) {
+        downloadVideo(e.target.dataset.url, e.target.dataset.quality);
+      }
+    });
+
+    input.addEventListener("paste", () => setTimeout(extract, 100));
+  </script>
+</body>
+</html>
