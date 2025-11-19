@@ -1,58 +1,59 @@
 <!doctype html>
 <html lang="vi">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Extract Video URLs by Quality</title>
+  <title>Tải Video Google Drive - Download Google Drive Video</title>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-    
-    body { 
+
+    body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       padding: 20px;
     }
-    
+
     .container {
       max-width: 900px;
       margin: 0 auto;
       background: white;
       border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       overflow: hidden;
     }
-    
+
     .header {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       padding: 30px;
       text-align: center;
     }
-    
+
     .header h1 {
       font-size: 28px;
       margin-bottom: 8px;
       font-weight: 600;
     }
-    
+
     .header p {
       opacity: 0.9;
       font-size: 14px;
     }
-    
+
     .content {
       padding: 30px;
     }
-    
+
     .input-section {
       margin-bottom: 24px;
     }
-    
+
     label {
       display: block;
       font-weight: 600;
@@ -60,8 +61,8 @@
       color: #333;
       font-size: 14px;
     }
-    
-    textarea { 
+
+    textarea {
       width: 100%;
       height: 180px;
       padding: 12px;
@@ -72,18 +73,18 @@
       resize: vertical;
       transition: border-color 0.3s;
     }
-    
+
     textarea:focus {
       outline: none;
       border-color: #667eea;
     }
-    
+
     .button-group {
       display: flex;
       gap: 12px;
       margin-top: 12px;
     }
-    
+
     button {
       padding: 12px 24px;
       border: none;
@@ -94,26 +95,26 @@
       transition: all 0.3s;
       flex: 1;
     }
-    
+
     .btn-primary {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
     }
-    
+
     .btn-primary:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
     }
-    
+
     .btn-secondary {
       background: #f5f5f5;
       color: #666;
     }
-    
+
     .btn-secondary:hover {
       background: #e0e0e0;
     }
-    
+
     .video-title-section {
       background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
       border-radius: 12px;
@@ -121,7 +122,7 @@
       margin-bottom: 24px;
       color: white;
     }
-    
+
     .video-title-label {
       font-size: 14px;
       font-weight: 600;
@@ -131,42 +132,42 @@
       align-items: center;
       gap: 8px;
     }
-    
+
     .title-display {
       display: flex;
       gap: 8px;
       align-items: stretch;
     }
-    
+
     .title-input {
       flex: 1;
       padding: 12px;
-      border: 2px solid rgba(255,255,255,0.3);
+      border: 2px solid rgba(255, 255, 255, 0.3);
       border-radius: 8px;
       font-size: 15px;
       font-weight: 600;
-      background: rgba(255,255,255,0.95);
+      background: rgba(255, 255, 255, 0.95);
       color: #333;
     }
-    
+
     .btn-copy-title {
       padding: 12px 24px;
-      background: rgba(255,255,255,0.25);
+      background: rgba(255, 255, 255, 0.25);
       color: white;
-      border: 2px solid rgba(255,255,255,0.4);
+      border: 2px solid rgba(255, 255, 255, 0.4);
       border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s;
       white-space: nowrap;
     }
-    
+
     .btn-copy-title:hover {
-      background: rgba(255,255,255,0.35);
-      border-color: rgba(255,255,255,0.6);
+      background: rgba(255, 255, 255, 0.35);
+      border-color: rgba(255, 255, 255, 0.6);
       transform: translateY(-2px);
     }
-    
+
     .instruction-box {
       background: #fff3cd;
       border: 2px solid #ffc107;
@@ -174,7 +175,7 @@
       padding: 16px;
       margin-bottom: 24px;
     }
-    
+
     .instruction-title {
       font-size: 15px;
       font-weight: 700;
@@ -184,19 +185,19 @@
       align-items: center;
       gap: 8px;
     }
-    
+
     .instruction-steps {
       list-style: none;
       padding: 0;
     }
-    
+
     .instruction-steps li {
       padding: 8px 0 8px 28px;
       color: #856404;
       position: relative;
       line-height: 1.5;
     }
-    
+
     .instruction-steps li:before {
       content: attr(data-step);
       position: absolute;
@@ -213,15 +214,15 @@
       font-size: 11px;
       font-weight: 700;
     }
-    
+
     .instruction-steps strong {
       color: #664d03;
     }
-    
+
     .results {
       margin-top: 32px;
     }
-    
+
     .results-header {
       font-size: 18px;
       font-weight: 600;
@@ -231,7 +232,7 @@
       align-items: center;
       gap: 8px;
     }
-    
+
     .quality-card {
       background: #f8f9fa;
       border: 2px solid #e0e0e0;
@@ -240,19 +241,19 @@
       margin-bottom: 16px;
       transition: all 0.3s;
     }
-    
+
     .quality-card:hover {
       border-color: #667eea;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
-    
+
     .quality-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 12px;
     }
-    
+
     .quality-badge {
       display: inline-flex;
       align-items: center;
@@ -262,23 +263,38 @@
       font-weight: 700;
       font-size: 16px;
     }
-    
-    .badge-360 { background: #e3f2fd; color: #1976d2; }
-    .badge-480 { background: #f3e5f5; color: #7b1fa2; }
-    .badge-720 { background: #fff3e0; color: #e65100; }
-    .badge-1080 { background: #e8f5e9; color: #2e7d32; }
-    
+
+    .badge-360 {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .badge-480 {
+      background: #f3e5f5;
+      color: #7b1fa2;
+    }
+
+    .badge-720 {
+      background: #fff3e0;
+      color: #e65100;
+    }
+
+    .badge-1080 {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
     .quality-info {
       font-size: 12px;
       color: #666;
     }
-    
+
     .url-display {
       display: flex;
       gap: 8px;
       margin-top: 12px;
     }
-    
+
     .url-input {
       flex: 1;
       padding: 10px 12px;
@@ -288,7 +304,7 @@
       font-family: 'Courier New', monospace;
       background: white;
     }
-    
+
     .btn-action {
       padding: 10px 20px;
       border: none;
@@ -299,25 +315,25 @@
       transition: all 0.3s;
       white-space: nowrap;
     }
-    
+
     .btn-copy {
       background: #667eea;
       color: white;
     }
-    
+
     .btn-copy:hover {
       background: #5568d3;
     }
-    
+
     .btn-download {
       background: #2e7d32;
       color: white;
     }
-    
+
     .btn-download:hover {
       background: #1b5e20;
     }
-    
+
     .status {
       margin-top: 16px;
       padding: 12px;
@@ -326,68 +342,93 @@
       text-align: center;
       font-weight: 500;
     }
-    
+
     .status-success {
       background: #e8f5e9;
       color: #2e7d32;
       border: 1px solid #a5d6a7;
     }
-    
+
     .status-error {
       background: #ffebee;
       color: #c62828;
       border: 1px solid #ef9a9a;
     }
-    
+
     .status-info {
       background: #e3f2fd;
       color: #1976d2;
       border: 1px solid #90caf9;
     }
-    
+
     .hidden {
       display: none;
     }
-    
+
     @media (max-width: 640px) {
       .url-display {
         flex-direction: column;
       }
-      
+
       .btn-action {
         width: 100%;
       }
-      
+
       .button-group {
         flex-direction: column;
       }
-      
+
       .title-display {
         flex-direction: column;
       }
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="header">
-      <h1>🎥 Video Quality Extractor</h1>
-      <p>Trích xuất URL video theo độ phân giải từ JSON</p>
+      <h1>🎥 Tải Video Google Drive</h1>
+      <p>Download video từ Google Drive theo chất lượng bạn muốn</p>
     </div>
-    
+
     <div class="content">
+      <div class="instruction-box">
+        <div class="instruction-title">
+          🔧 Hướng dẫn lấy JSON từ Google Drive
+        </div>
+        <ul class="instruction-steps">
+          <li data-step="1">Mở <strong>link video Google Drive</strong> trong trình duyệt<br><a
+              href="https://drive.google.com/file/d/1LQJaiqtpr8R73FUVdxTj5-iSoXpXRUMq/view?usp=drive_link"
+              target="_blank" style="color: #0066cc; text-decoration: underline; font-size: 12px;">Ví dụ:
+              https://drive.google.com/file/d/1LQJaiqtpr8R73FUVdxTj5-iSoXpXRUMq/view</a></li>
+          <li data-step="2">Nhấn <strong>F12</strong> hoặc chuột phải → chọn <strong>"Inspect"</strong> để mở DevTools
+          </li>
+          <li data-step="3">Chọn tab <strong>"Network"</strong> trong DevTools</li>
+          <li data-step="4">Trong ô filter/search, gõ: <strong>playback</strong></li>
+          <li data-step="5">Refresh lại trang (F5) để load lại video</li>
+          <li data-step="6">Click vào request có tên <strong>"playback..."</strong> xuất hiện</li>
+          <li data-step="7">Chọn tab <strong>"Response"</strong> → chuột phải → chọn <strong>"Copy response"</strong>
+          </li>
+          <li data-step="8">Dán JSON vào ô bên dưới và bấm <strong>"Trích xuất"</strong></li>
+        </ul>
+      </div>
+
       <div class="input-section">
         <label for="input">📋 Dán JSON vào đây:</label>
-        <textarea id="input" placeholder='Paste your JSON data here...'></textarea>
-        
+        <textarea id="input" placeholder='Paste your JSON data here...
+
+Ví dụ link video Google Drive:
+https://drive.google.com/file/d/1LQJaiqtpr8R73FUVdxTj5-iSoXpXRUMq/view?usp=drive_link'></textarea>
+
         <div class="button-group">
           <button id="extract" class="btn-primary">🔍 Trích xuất</button>
           <button id="clear" class="btn-secondary">🗑️ Xóa</button>
         </div>
       </div>
-      
+
       <div id="status" class="status hidden"></div>
-      
+
       <div id="videoTitleSection" class="video-title-section hidden">
         <div class="video-title-label">
           🎬 Tên Video (Copy để dùng khi lưu file)
@@ -397,20 +438,23 @@
           <button id="copyTitle" class="btn-copy-title">📋 Copy Tên</button>
         </div>
       </div>
-      
+
       <div id="instructionBox" class="instruction-box hidden">
         <div class="instruction-title">
           💡 Hướng dẫn lưu video với tên đúng
         </div>
         <ul class="instruction-steps">
           <li data-step="1">Bấm nút <strong>"⬇️ Download"</strong> bên dưới (video sẽ mở trong tab mới)</li>
-          <li data-step="2">Nhấp chuột phải vào video đang phát → chọn <strong>"Lưu video dưới dạng..."</strong> hoặc <strong>"Save video as..."</strong></li>
+          <li data-step="2">Nhấp chuột phải vào video đang phát → chọn <strong>"Lưu video dưới dạng..."</strong> hoặc
+            <strong>"Save video as..."</strong>
+          </li>
           <li data-step="3">Trong ô tên file, <strong>dán tên</strong> đã copy ở trên (Ctrl+V / Cmd+V)</li>
-          <li data-step="4">Thêm chất lượng vào cuối, ví dụ: <strong>"Tên_Video_1080p.mp4"</strong>(có thể bỏ qua bước này)</li>
+          <li data-step="4">Thêm chất lượng vào cuối, ví dụ: <strong>"Tên_Video_1080p.mp4"</strong>(có thể bỏ qua bước
+            này)</li>
           <li data-step="5">Bấm <strong>"Lưu"</strong> và hoàn tất! 🎉</li>
         </ul>
       </div>
-      
+
       <div id="results" class="results hidden">
         <div class="results-header">
           <span>📊 Kết quả tìm kiếm</span>
@@ -458,7 +502,7 @@
       const seen = new WeakSet();
       const results = {};
       videoTitle = "";
-      
+
       function dfs(node) {
         if (!node || typeof node !== "object") return;
         if (seen.has(node)) return;
@@ -489,7 +533,7 @@
           }
         }
       }
-      
+
       dfs(root);
       return results;
     }
@@ -508,7 +552,7 @@
       const quality = qualityMap[itag];
       const card = document.createElement("div");
       card.className = "quality-card";
-      
+
       card.innerHTML = `
         <div class="quality-header">
           <span class="quality-badge ${quality.badge}">
@@ -522,7 +566,7 @@
           <button class="btn-action btn-download" data-url="${url}" data-quality="${quality.label}">⬇️ Download</button>
         </div>
       `;
-      
+
       return card;
     }
 
@@ -593,7 +637,7 @@
 
     // Event listeners
     $("#extract").addEventListener("click", extract);
-    
+
     $("#clear").addEventListener("click", () => {
       input.value = "";
       qualityCards.innerHTML = "";
@@ -618,4 +662,5 @@
     input.addEventListener("paste", () => setTimeout(extract, 100));
   </script>
 </body>
+
 </html>
