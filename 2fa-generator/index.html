@@ -202,8 +202,6 @@
         </div>
 
         <div id="resultBox" class="result-box">
-            <div class="secret-display" id="secretDisplay">Chưa có mã secret</div>
-
             <div class="qr-container">
                 <div id="qrcode"></div>
             </div>
@@ -232,7 +230,6 @@
 
         const secretInput = document.getElementById('secretInput');
         const resultBox = document.getElementById('resultBox');
-        const secretDisplay = document.getElementById('secretDisplay');
         const qrcodeDiv = document.getElementById('qrcode');
         const otpCode = document.getElementById('otpCode');
         const otpTimer = document.getElementById('otpTimer');
@@ -263,7 +260,6 @@
         function generateQRAndOTP(secret) {
             try {
                 errorMessage.classList.add('hidden');
-                secretDisplay.textContent = secret;
 
                 qrcodeDiv.innerHTML = '';
                 new QRCode(qrcodeDiv, {
@@ -286,7 +282,6 @@
         }
 
         function resetDisplay() {
-            secretDisplay.textContent = 'Chưa có mã secret';
             qrcodeDiv.innerHTML = '<div style="width: 200px; height: 200px; background: #f0f0f0; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #999;">QR Code</div>';
             otpCode.textContent = '------';
             otpTimer.textContent = '30';
