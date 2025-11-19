@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON to Console Code Generator</title>
+    <title>Fluent form JSON to Console Code Generator input</title>
     <style>
         * {
             margin: 0;
@@ -204,15 +204,18 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚀 JSON to Console Code Generator</h1>
-            <p>Chuyển đổi JSON thành code tự động điền form</p>
+            <h1>🚀 JSON to Console Code Generator for Fluent Form</h1>
+            <p>Chuyển đổi JSON thành code tự động điền form Fluent Form</p>
         </div>
 
         <div class="content">
             <div class="info-box">
                 <h3>📝 Hướng dẫn sử dụng:</h3>
                 <ul>
-                    <li>Paste JSON array vào ô bên dưới (format từ file json.json của bạn)</li>
+                    <li>Copy link API của form Fluent Form ở tab network của devtool có dạng
+                        /wp-json/fluentform/v1/forms/19/shortcodes?fluent_forms_admin_nonce=fb155bb0ac&input_only=true&query_timestamp=1763537568066
+                    </li>
+                    <li>Copy JSON array từ tab response của devtool và paste vào ô bên dưới</li>
                     <li>Thêm các key không muốn xử lý vào "Exclude Keys" (mặc định đã có)</li>
                     <li>Click "Generate Code" để tạo code</li>
                     <li>Copy code và paste vào Console của trình duyệt</li>
