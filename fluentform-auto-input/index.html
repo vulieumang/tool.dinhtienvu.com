@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON to Console Code Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: #667eea;
+            border-radius: 2px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        #jsonInput {
+            min-height: 300px;
+            background: #f8f9fa;
+        }
+
+        #output {
+            min-height: 400px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-generate {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-copy {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-copy:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(72, 187, 120, 0.4);
+        }
+
+        .btn-copy:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .info-box {
+            background: #e6f2ff;
+            border-left: 4px solid #667eea;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .info-box h3 {
+            color: #667eea;
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .info-box ul {
+            list-style: none;
+            font-size: 13px;
+            color: #4a5568;
+        }
+
+        .info-box li {
+            padding: 4px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .info-box li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #48bb78;
+            font-weight: bold;
+        }
+
+        .status {
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .status.success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .status.error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 JSON to Console Code Generator</h1>
+            <p>Chuyển đổi JSON thành code tự động điền form</p>
+        </div>
+
+        <div class="content">
+            <div class="info-box">
+                <h3>📝 Hướng dẫn sử dụng:</h3>
+                <ul>
+                    <li>Paste JSON array vào ô bên dưới (format từ file json.json của bạn)</li>
+                    <li>Thêm các key không muốn xử lý vào "Exclude Keys" (mặc định đã có)</li>
+                    <li>Click "Generate Code" để tạo code</li>
+                    <li>Copy code và paste vào Console của trình duyệt</li>
+                    <li>Tool tự động bỏ qua các trường "input_hidden"</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Exclude Keys (Các key không cần làm)</div>
+                <textarea id="excludeKeys" rows="4" placeholder="Nhập các key không muốn xử lý, mỗi key một dòng">{all_data}
+{all_data_without_hidden_fields}
+{inputs.names}
+{form_title}
+{pdf.download_link}
+</textarea>
+            </div>
+
+            <div class="section">
+                <div class="section-title">JSON Input</div>
+                <textarea id="jsonInput" placeholder='Paste JSON ở đây, ví dụ:
+[
+    {
+        "shortcodes": {
+            "{inputs.email}": "Email",
+            "{inputs.phone}": "Số điện thoại"
+        },
+        "title": "Input Options"
+    },
+    {
+        "shortcodes": {
+            "{pdf.download_link}": "Submission PDF link",
+            "{pdf.download_link.123}": "PDF Title"
+        },
+        "title": "PDF"
+    }
+]'></textarea>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-generate" onclick="generateCode()">Generate Code</button>
+                <button class="btn-copy" id="copyBtn" onclick="copyCode()" disabled>Copy Code</button>
+            </div>
+
+            <div id="status" class="status"></div>
+
+            <div class="section">
+                <div class="section-title">Generated Code</div>
+                <textarea id="output" readonly placeholder="Code sẽ xuất hiện ở đây..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 3000);
+        }
+
+        function generateCode() {
+            const input = document.getElementById('jsonInput').value.trim();
+            const excludeKeysInput = document.getElementById('excludeKeys').value.trim();
+            const output = document.getElementById('output');
+            const copyBtn = document.getElementById('copyBtn');
+
+            if (!input) {
+                showStatus('❌ Vui lòng nhập JSON!', 'error');
+                return;
+            }
+
+            try {
+                const jsonData = JSON.parse(input);
+
+                if (!Array.isArray(jsonData)) {
+                    throw new Error('JSON phải là một array');
+                }
+
+                // Lấy danh sách exclude keys
+                const excludeKeys = excludeKeysInput
+                    .split('\n')
+                    .map(k => k.trim())
+                    .filter(k => k.length > 0);
+
+                // Thu thập shortcodes, chỉ lấy Input Options, PDF và Entry Attributes
+                const allData = {};
+
+                jsonData.forEach(section => {
+                    const title = section.title ? section.title.toLowerCase() : '';
+
+                    // Chỉ lấy Input Options, PDF và Entry Attributes
+                    if (!title.includes('input') && !title.includes('pdf') && !title.includes('entry')) {
+                        return;
+                    }
+
+                    if (section.shortcodes) {
+                        Object.entries(section.shortcodes).forEach(([key, value]) => {
+                            // Bỏ qua input_hidden
+                            if (value.toLowerCase().includes('input_hidden')) {
+                                return;
+                            }
+
+                            // Bỏ qua các key trong exclude list
+                            if (excludeKeys.includes(key)) {
+                                return;
+                            }
+
+                            // Thêm vào data
+                            if (!allData[key]) {
+                                allData[key] = value;
+                            }
+                        });
+                    }
+                });
+
+                if (Object.keys(allData).length === 0) {
+                    throw new Error('Không tìm thấy dữ liệu hợp lệ trong JSON');
+                }
+
+                // Tạo code
+                const code = `// Auto-generated code - Total: ${Object.keys(allData).length} fields
+const data = ${JSON.stringify(allData, null, 4)};
+
+(async function() {
+    const d = ms => new Promise(r => setTimeout(r, ms));
+    
+    function setVal(input, val) {
+        input.value = val;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        input.dispatchEvent(new Event('blur', { bubbles: true }));
+    }
+    
+    let count = 0;
+    const total = Object.keys(data).length;
+    
+    for (const [value, label] of Object.entries(data)) {
+        // Click nút plus cuối cùng
+        let btns = document.querySelectorAll('.ff_icon_btn.el-icon-plus');
+        btns[btns.length - 1].click();
+        await d(400);
+        
+        // Lấy row cuối và nhập dữ liệu
+        let rows = document.querySelectorAll('tbody tr');
+        let inputs = rows[rows.length - 1].querySelectorAll('input');
+        
+        setVal(inputs[0], label);
+        await d(100);
+        setVal(inputs[1], value);
+        await d(600);
+        
+        count++;
+        console.log(\`✓ \${count}/\${total}: \${label}\`);
+    }
+    
+    console.log(\`✅ Hoàn thành! Đã thêm \${count} fields.\`);
+})();`;
+
+                output.value = code;
+                copyBtn.disabled = false;
+                showStatus(`✅ Đã tạo code cho ${Object.keys(allData).length} fields!`, 'success');
+
+            } catch (error) {
+                showStatus(`❌ Lỗi: ${error.message}`, 'error');
+                output.value = '';
+                copyBtn.disabled = true;
+            }
+        }
+
+        function copyCode() {
+            const output = document.getElementById('output');
+            output.select();
+            document.execCommand('copy');
+
+            const copyBtn = document.getElementById('copyBtn');
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = '✓ Đã Copy!';
+
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+            }, 2000);
+
+            showStatus('✅ Đã copy code vào clipboard!', 'success');
+        }
+
+        // Auto-generate on Ctrl+Enter
+        document.getElementById('jsonInput').addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                generateCode();
+            }
+        });
+    </script>
+</body>
+
+</html>
