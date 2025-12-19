@@ -434,6 +434,15 @@
             <input type="text" id="secretInput" placeholder="Paste mã 2FA secret vào đây..." autocomplete="off">
         </div>
 
+        <div class="input-group" style="margin-top: -15px;">
+            <label for="quickLinkInput" style="display: flex; justify-content: space-between;">
+                Share Link (Quick Generation)
+                <span style="font-size: 12px; opacity: 0.7; font-weight: normal;">Click để copy</span>
+            </label>
+            <input type="text" id="quickLinkInput" placeholder="Link chia sẻ sẽ xuất hiện ở đây..." readonly
+                style="cursor: pointer; font-size: 14px; opacity: 0.9;">
+        </div>
+
         <div id="resultBox" class="result-box">
             <div class="qr-container">
                 <div id="qrcode"></div>
@@ -473,6 +482,8 @@
 
         secretInput.addEventListener('input', function (e) {
             const secret = e.target.value.trim().toUpperCase().replace(/\s/g, '');
+            updateQuickLink(secret); // Update link dynamically
+
             if (secret.length > 0) {
                 currentSecret = secret;
                 generateQRAndOTP(secret);
@@ -619,6 +630,39 @@
         resetDisplay();
 
         updateOTP();
+
+        // Quick Link Logic
+        const quickLinkInput = document.getElementById('quickLinkInput');
+
+        function updateQuickLink(secret) {
+            if (secret) {
+                const url = new URL(window.location.href);
+                url.searchParams.set('2fa', secret);
+                quickLinkInput.value = url.toString();
+            } else {
+                quickLinkInput.value = '';
+            }
+        }
+
+        quickLinkInput.addEventListener('click', function () {
+            if (quickLinkInput.value) {
+                navigator.clipboard.writeText(quickLinkInput.value).then(() => {
+                    const originalValue = quickLinkInput.value;
+                    showCopyNotice();
+                });
+            }
+        });
+
+        // Check for 2FA param on load
+        window.addEventListener('load', () => {
+            const params = new URLSearchParams(window.location.search);
+            const secretParam = params.get('2fa');
+            if (secretParam) {
+                secretInput.value = secretParam;
+                // Trigger input event to start generation
+                secretInput.dispatchEvent(new Event('input'));
+            }
+        });
     </script>
 </body>
 
