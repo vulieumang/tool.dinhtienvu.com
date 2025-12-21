@@ -580,6 +580,8 @@
         </div>
 
         <div id="resultBox" class="result-box">
+            <input type="text" id="labelName" placeholder="Tên gợi nhớ (tùy chọn)..." autocomplete="off"
+                style="background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.2); color: white; text-align: center; margin-bottom: 15px; font-size: 13px; width: 100%; outline: none; opacity: 0.6; padding: 5px 0;">
             <div class="qr-container">
                 <div id="qrcode"></div>
             </div>
@@ -635,10 +637,19 @@
         const otpDisplay = document.getElementById('otpDisplay');
         const copyNotice = document.getElementById('copyNotice');
         const errorMessage = document.getElementById('errorMessage');
+        const labelNameInput = document.getElementById('labelName');
+
+        labelNameInput.addEventListener('input', () => {
+            if (currentSecret) {
+                generateQRAndOTP(currentSecret);
+                updateQuickLink(currentSecret, labelNameInput.value.trim());
+            }
+        });
 
         secretInput.addEventListener('input', function (e) {
             const secret = e.target.value.trim().toUpperCase().replace(/\s/g, '');
-            updateQuickLink(secret); // Update link dynamically
+            const label = labelNameInput.value.trim();
+            updateQuickLink(secret, label); // Update link dynamically
 
             if (secret.length > 0) {
                 currentSecret = secret;
@@ -660,10 +671,11 @@
         function generateQRAndOTP(secret) {
             try {
                 errorMessage.classList.add('hidden');
+                const label = labelNameInput.value.trim() || '2FA';
 
                 qrcodeDiv.innerHTML = '';
                 new QRCode(qrcodeDiv, {
-                    text: `otpauth://totp/Account?secret=${secret}&issuer=2FA`,
+                    text: `otpauth://totp/${encodeURIComponent(label)}?secret=${secret}&issuer=`,
                     width: 200,
                     height: 200,
                     colorDark: "#000000",
@@ -790,10 +802,12 @@
         // Quick Link Logic
         const quickLinkInput = document.getElementById('quickLinkInput');
 
-        function updateQuickLink(secret) {
+        function updateQuickLink(secret, label) {
             if (secret) {
                 const url = new URL(window.location.href);
                 url.searchParams.set('2fa', secret);
+                if (label) url.searchParams.set('label', label);
+                else url.searchParams.delete('label');
                 quickLinkInput.value = url.toString();
             } else {
                 quickLinkInput.value = '';
@@ -813,6 +827,8 @@
         window.addEventListener('load', () => {
             const params = new URLSearchParams(window.location.search);
             const secretParam = params.get('2fa');
+            const labelParam = params.get('label');
+            if (labelParam) labelNameInput.value = labelParam;
             if (secretParam) {
                 secretInput.value = secretParam;
                 // Trigger input event to start generation
@@ -867,12 +883,20 @@
 
         function onScanSuccess(decodedText) {
             let secret = decodedText;
+            let label = '';
 
             // Handle otpauth:// links
             if (decodedText.startsWith('otpauth://')) {
                 try {
                     const url = new URL(decodedText);
                     secret = url.searchParams.get('secret');
+
+                    // Extract label from pathname
+                    let path = url.pathname.replace(/^\/\//, '').replace(/^\//, '');
+                    if (path.startsWith('totp/')) {
+                        path = path.substring(5);
+                    }
+                    label = decodeURIComponent(path);
                 } catch (e) {
                     showError("Mã QR không hợp lệ!");
                     return;
@@ -880,6 +904,7 @@
             }
 
             if (secret) {
+                if (label) labelNameInput.value = label;
                 secretInput.value = secret.toUpperCase();
                 secretInput.dispatchEvent(new Event('input'));
                 stopScanner();
