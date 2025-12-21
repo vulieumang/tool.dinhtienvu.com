@@ -4,10 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quét QR từ Ảnh - QR Code Scanner from Image</title>
+    <!-- Author: WITI.VN -->
+    <title>WITI - Quét QR từ Ảnh - QR Code Scanner from Image</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         * {
             margin: 0;
@@ -405,6 +407,107 @@
         .home-button:hover svg {
             transform: scale(1.1);
         }
+
+        /* Camera Scanner Styles */
+        #scannerModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(15px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .scanner-container {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .scanner-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .scanner-header h3 {
+            margin: 0;
+            color: #1a202c;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .close-scanner {
+            background: #edf2f7;
+            border: none;
+            color: #4a5568;
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .close-scanner:hover {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        #reader {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .camera-btn {
+            margin-top: 16px;
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .camera-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        #reader__dashboard_section_csr button {
+            background: #667eea !important;
+            border: none !important;
+            color: white !important;
+            padding: 8px 16px !important;
+            border-radius: 8px !important;
+            cursor: pointer !important;
+        }
     </style>
 </head>
 
@@ -420,8 +523,8 @@
 
     <div class="container">
         <div class="header">
-            <h1>🖼️ Quét QR từ Ảnh</h1>
-            <p>Upload ảnh chứa mã QR để đọc nội dung</p>
+            <h1>🖼️ WITI - Quét QR từ Ảnh</h1>
+            <p>Upload ảnh chứa mã QR hoặc quét trực tiếp từ Camera</p>
         </div>
 
         <div class="content">
@@ -444,6 +547,16 @@
                     <div class="upload-hint">Hỗ trợ: JPG, PNG, GIF, WebP</div>
                 </div>
                 <input type="file" id="fileInput" accept="image/*">
+
+                <button id="openCameraBtn" class="camera-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                        </path>
+                        <circle cx="12" cy="13" r="4"></circle>
+                    </svg>
+                    Quét bằng Camera
+                </button>
             </div>
 
             <div id="status" class="status"></div>
@@ -463,22 +576,39 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <!-- Scanner Modal -->
+    <div id="scannerModal">
+        <div class="scanner-container">
+            <div class="scanner-header">
+                <h3>Quét bằng Camera</h3>
+                <button class="close-scanner" id="closeScanner">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div id="reader"></div>
+            <div style="margin-top: 16px; text-align: center; color: #718096; font-size: 0.875rem;">
+                Căn chỉnh mã QR vào giữa khung hình
+            </div>
+        </div>
+    </div>
+
     <script>
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
-        const previewSection = document.getElementById('previewSection');
-        const imagePreview = document.getElementById('imagePreview');
-        const scanBtn = document.getElementById('scanBtn');
-        const clearBtn = document.getElementById('clearBtn');
         const resultSection = document.getElementById('resultSection');
         const resultText = document.getElementById('resultText');
         const copyBtn = document.getElementById('copyBtn');
         const openLinkBtn = document.getElementById('openLinkBtn');
         const statusDiv = document.getElementById('status');
+        const openCameraBtn = document.getElementById('openCameraBtn');
+        const closeScanner = document.getElementById('closeScanner');
+        const scannerModal = document.getElementById('scannerModal');
 
-        let selectedFile = null;
-        let imageData = null;
+        let html5QrCode;
 
         function showStatus(message, type = 'info') {
             statusDiv.textContent = message;
@@ -498,109 +628,90 @@
             }
         }
 
-        // Upload area click
-        uploadArea.addEventListener('click', () => {
-            fileInput.click();
-        });
+        // Camera Scanner Logic
+        openCameraBtn.addEventListener('click', startCamera);
+        closeScanner.addEventListener('click', stopCamera);
 
-        // Drag and drop
+        async function startCamera() {
+            scannerModal.style.display = 'flex';
+            html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+            try {
+                await html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
+                    handleScanSuccess(decodedText);
+                    stopCamera();
+                });
+            } catch (err) {
+                console.error("Camera error:", err);
+                showStatus('❌ Lỗi camera: ' + err.message, 'error');
+                stopCamera();
+            }
+        }
+
+        async function stopCamera() {
+            if (html5QrCode && html5QrCode.isScanning) {
+                await html5QrCode.stop();
+                html5QrCode.clear();
+            }
+            scannerModal.style.display = 'none';
+        }
+
+        function handleScanSuccess(decodedText) {
+            resultText.value = decodedText;
+            resultSection.classList.add('show');
+
+            if (isValidUrl(decodedText)) {
+                openLinkBtn.style.display = 'inline-block';
+                openLinkBtn.href = decodedText;
+            } else {
+                openLinkBtn.style.display = 'none';
+            }
+
+            showStatus('✅ Quét thành công!', 'success');
+            setTimeout(hideStatus, 3000);
+        }
+
+        // Image Selection & Drop Logic
+        uploadArea.addEventListener('click', () => fileInput.click());
+
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             uploadArea.classList.add('dragover');
         });
 
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragover');
-        });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
 
         uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
             uploadArea.classList.remove('dragover');
-
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                handleFile(files[0]);
-            }
+            if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
         });
 
-        // File input change
         fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                handleFile(e.target.files[0]);
-            }
+            if (e.target.files.length > 0) handleFile(e.target.files[0]);
         });
 
-        function handleFile(file) {
+        async function handleFile(file) {
             if (!file.type.startsWith('image/')) {
                 showStatus('❌ Vui lòng chọn file ảnh hợp lệ', 'error');
                 return;
             }
 
-            selectedFile = file;
-            const reader = new FileReader();
+            resultSection.classList.remove('show');
+            showStatus('🔍 Đang phân tích ảnh...', 'info');
 
-            reader.onload = (e) => {
-                resultSection.classList.remove('show');
-                showStatus('🔍 Đang quét mã QR...', 'info');
-
-                // Load image data for scanning
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    ctx.drawImage(img, 0, 0);
-                    imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-                    // Auto-scan after loading image
-                    scanQRCode();
-                };
-                img.src = e.target.result;
-            };
-
-            reader.readAsDataURL(file);
-        }
-
-        // Scan QR code
-        function scanQRCode() {
-            if (!imageData) {
-                showStatus('❌ Lỗi khi tải ảnh', 'error');
-                return;
-            }
-
+            const html5QrCodeImage = new Html5Qrcode("reader", false);
             try {
-                // Use jsQR to decode
-                const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                    inversionAttempts: "dontInvert",
-                });
-
-                if (code && code.data) {
-                    resultText.value = code.data;
-                    resultSection.classList.add('show');
-
-                    // Check if result is a URL
-                    if (isValidUrl(code.data)) {
-                        openLinkBtn.style.display = 'inline-block';
-                        openLinkBtn.href = code.data;
-                    } else {
-                        openLinkBtn.style.display = 'none';
-                    }
-
-                    showStatus('✅ Quét thành công!', 'success');
-                    setTimeout(hideStatus, 3000);
-                } else {
-                    showStatus('❌ Không tìm thấy mã QR trong ảnh', 'error');
-                    resultSection.classList.remove('show');
-                }
+                const decodedText = await html5QrCodeImage.scanFile(file, true);
+                handleScanSuccess(decodedText);
             } catch (err) {
-                console.error('Scan error:', err);
-                showStatus('❌ Lỗi khi quét: ' + err.message, 'error');
-                resultSection.classList.remove('show');
+                console.error("Scan error:", err);
+                showStatus('❌ Không tìm thấy mã QR trong ảnh này', 'error');
+            } finally {
+                html5QrCodeImage.clear();
             }
         }
-
-
 
         // Copy to clipboard
         copyBtn.addEventListener('click', async () => {
@@ -609,7 +720,7 @@
                 showStatus('✅ Đã copy vào clipboard!', 'success');
                 setTimeout(hideStatus, 2000);
             } catch (err) {
-                showStatus('❌ Không thể copy. Vui lòng copy thủ công.', 'error');
+                showStatus('❌ Không thể copy nội dung', 'error');
             }
         });
     </script>
