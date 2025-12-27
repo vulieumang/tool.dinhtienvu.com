@@ -543,7 +543,7 @@
             <div class="upload-section">
                 <div class="upload-area" id="uploadArea">
                     <div class="upload-icon">📤</div>
-                    <div class="upload-text">Click để chọn ảnh hoặc kéo thả vào đây</div>
+                    <div class="upload-text">Click để chọn ảnh, kéo thả hoặc dán từ clipboard (Ctrl+V)</div>
                     <div class="upload-hint">Hỗ trợ: JPG, PNG, GIF, WebP</div>
                 </div>
                 <input type="file" id="fileInput" accept="image/*">
@@ -721,6 +721,19 @@
                 setTimeout(hideStatus, 2000);
             } catch (err) {
                 showStatus('❌ Không thể copy nội dung', 'error');
+            }
+        });
+
+        // Global Paste Listener
+        window.addEventListener('paste', async (e) => {
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) {
+                    const file = item.getAsFile();
+                    showStatus('📋 Đã nhận ảnh từ clipboard...', 'info');
+                    handleFile(file);
+                    break;
+                }
             }
         });
     </script>
