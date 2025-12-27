@@ -240,7 +240,7 @@
             font-size: 1rem;
             word-break: break-all;
             color: var(--warning);
-            padding-right: 40px;
+            padding-right: 80px;
         }
 
         .copy-btn-mini {
@@ -254,8 +254,20 @@
             cursor: pointer;
         }
 
-        .copy-btn-mini:hover {
+        .copy-btn-mini:hover,
+        .share-btn-mini:hover {
             color: white;
+        }
+
+        .share-btn-mini {
+            position: absolute;
+            right: 45px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
         }
 
         .qr-result-container {
@@ -473,6 +485,77 @@
             gap: 15px;
         }
 
+        /* Manual Input Modal */
+        #manualModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .manual-content {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .manual-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: white;
+            text-align: center;
+        }
+
+        .manual-subtitle {
+            color: var(--text-dim);
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .input-wrapper {
+            margin-bottom: 25px;
+        }
+
+        .manual-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .manual-input:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .manual-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
         #toast {
             position: fixed;
             bottom: 30px;
@@ -605,6 +688,16 @@
                             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
                         </svg>
                     </button>
+                    <button class="share-btn-mini" onclick="shareAuth()" title="Chia sẻ Link">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3" />
+                            <circle cx="6" cy="12" r="3" />
+                            <circle cx="18" cy="19" r="3" />
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                        </svg>
+                    </button>
                 </div>
 
                 <div id="qrResult" class="qr-result-container"></div>
@@ -656,6 +749,22 @@
         </div>
     </div>
 
+    <div id="manualModal">
+        <div class="manual-content">
+            <h3 class="manual-title">Nhập tay</h3>
+            <p class="manual-subtitle">Dán <b>OTPAuth URL</b> hoặc <b>Secret Key</b> (ví dụ: JBSWY3DPEHPK3PXP) vào bên
+                dưới.</p>
+            <div class="input-wrapper">
+                <input type="text" id="manualInput" class="manual-input" placeholder="otpauth://... hoặc JBSW..."
+                    autocomplete="off">
+            </div>
+            <div class="manual-actions">
+                <button id="manualCancel" class="btn btn-secondary">Hủy</button>
+                <button id="manualSubmit" class="btn btn-primary">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast">Thông báo</div>
 
     <script>
@@ -686,6 +795,35 @@
         confirmCancel.onclick = () => {
             confirmModal.style.display = 'none';
             if (confirmPromise) confirmPromise(false);
+        };
+
+        // --- Manual Input Logic ---
+        const manualModal = document.getElementById('manualModal');
+        const manualInput = document.getElementById('manualInput');
+        const manualSubmit = document.getElementById('manualSubmit');
+        const manualCancel = document.getElementById('manualCancel');
+
+        document.getElementById('manualBtn').onclick = () => {
+            manualInput.value = '';
+            manualModal.style.display = 'flex';
+            manualInput.focus();
+        };
+
+        manualCancel.onclick = () => {
+            manualModal.style.display = 'none';
+        };
+
+        manualSubmit.onclick = () => {
+            const val = manualInput.value.trim();
+            if (val) {
+                handleScan(val);
+                manualModal.style.display = 'none';
+            }
+        };
+
+        manualInput.onkeydown = (e) => {
+            if (e.key === 'Enter') manualSubmit.click();
+            if (e.key === 'Escape') manualCancel.click();
         };
 
         // --- Core TOTP Logic ---
@@ -950,6 +1088,15 @@
             showToast('Đã copy mã Secret!');
         };
 
+        window.shareAuth = () => {
+            if (!currentAuth) return;
+            // Encode the raw otpauth URL to base64 for the URL hash
+            const encoded = btoa(unescape(encodeURIComponent(currentAuth.raw)));
+            const shareUrl = `${window.location.origin}${window.location.pathname}#code=${encoded}`;
+            navigator.clipboard.writeText(shareUrl);
+            showToast('Đã copy Link chia sẻ!');
+        };
+
         // --- Scanning Methods ---
         async function handleScan(result) {
             const auth = parseOtpAuth(result);
@@ -1024,17 +1171,24 @@
 
         document.getElementById('closeScanner').onclick = stopCamera;
 
-        // 5. Manual Entry
-        document.getElementById('manualBtn').onclick = () => {
-            const secret = prompt('Nhập mã 2FA Secret:');
-            if (secret) {
-                const auth = parseOtpAuth(secret);
-                if (auth) startOTP(auth);
-            }
-        };
-
         // Initialize
+        function initFromHash() {
+            const hash = window.location.hash;
+            if (hash.startsWith('#code=')) {
+                try {
+                    const encoded = hash.substring(6);
+                    const decoded = decodeURIComponent(escape(atob(encoded)));
+                    handleScan(decoded);
+                    // Clear hash after loading to avoid re-triggering on refresh if history exists
+                    window.history.replaceState(null, null, window.location.pathname);
+                } catch (e) {
+                    console.error('Failed to parse share link', e);
+                }
+            }
+        }
+
         renderHistory();
+        initFromHash();
     </script>
 </body>
 
