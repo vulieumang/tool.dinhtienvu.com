@@ -17,7 +17,8 @@
             --accent-color: #3b82f6;
             --accent-hover: #60a5fa;
             --card-hover-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-speed: 0.3s;
+            --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -96,13 +97,16 @@
             text-decoration: none;
             color: inherit;
             border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: var(--transition);
+            transition: transform var(--transition-speed) var(--transition-timing),
+                box-shadow var(--transition-speed) var(--transition-timing),
+                border-color var(--transition-speed) var(--transition-timing);
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             height: 100%;
             animation: fadeInUp 0.8s ease-out backwards;
+            will-change: transform, box-shadow;
         }
 
         /* Staggered animation for cards */
@@ -155,7 +159,9 @@
             justify-content: center;
             border-radius: 12px;
             color: var(--accent-color);
-            transition: var(--transition);
+            transition: transform var(--transition-speed) var(--transition-timing),
+                background-color var(--transition-speed) var(--transition-timing),
+                color var(--transition-speed) var(--transition-timing);
         }
 
         .card:hover .card-icon {
@@ -186,7 +192,8 @@
             font-size: 0.875rem;
             opacity: 0;
             transform: translateX(-10px);
-            transition: var(--transition);
+            transition: opacity var(--transition-speed) var(--transition-timing),
+                transform var(--transition-speed) var(--transition-timing);
         }
 
         .card:hover .card-arrow {
