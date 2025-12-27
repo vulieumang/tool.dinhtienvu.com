@@ -1029,16 +1029,8 @@
             refresh();
             otpUpdateInterval = setInterval(refresh, 1000);
 
-            // Add to history if not exists or update timestamp
-            const existingIndex = history.findIndex(h => h.secret === auth.secret);
-            if (existingIndex !== -1) {
-                // Move to top and update timestamp
-                const item = history.splice(existingIndex, 1)[0];
-                item.timestamp = Date.now();
-                history.unshift(item);
-            } else {
-                history.unshift(auth);
-            }
+            // Always add to history as a new entry (allow duplicates)
+            history.unshift(auth);
             updateHistory();
         }
 
