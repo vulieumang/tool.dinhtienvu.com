@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xóa Tất Cả Field - Fluent Form Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            margin-top: 60px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #efefef;
+        }
+
+        .section-ultra {
+            background: #fff5f5;
+            border-color: #feb2b2;
+        }
+
+        .section-normal {
+            background: #f7fafc;
+            border-color: #e2e8f0;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .title-ultra {
+            color: #c53030;
+        }
+
+        .title-normal {
+            color: #2d3748;
+        }
+
+        .bookmarklet-box {
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+        }
+
+        .bookmarklet-link {
+            display: inline-block;
+            color: white;
+            padding: 15px 35px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s;
+            cursor: move;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-ultra {
+            background: linear-gradient(135deg, #f56565 0%, #c53030 100%);
+        }
+
+        .btn-normal {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .bookmarklet-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .instructions {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #4a5568;
+            border: 1px solid #edf2f7;
+        }
+
+        .instructions ol {
+            padding-left: 20px;
+        }
+
+        .code-container {
+            position: relative;
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 20px;
+            padding-top: 45px;
+        }
+
+        code {
+            color: #d4d4d4;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            display: block;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #555;
+            color: white;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #777;
+        }
+
+        .copy-btn.success {
+            background: #48bb78;
+        }
+
+        .home-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            color: #667eea;
+            padding: 12px 24px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .gen-button {
+            left: auto;
+            right: 20px;
+            background: #667eea;
+            color: white;
+        }
+
+        .home-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .gen-button:hover {
+            background: #764ba2;
+        }
+
+        .warning-box {
+            background: #fffaf0;
+            border-left: 4px solid #ed8936;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            color: #7b341e;
+            font-size: 14px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="/" class="home-button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        Trang chủ
+    </a>
+
+    <a href="index.html" class="home-button gen-button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 18 22 12 16 6"></polyline>
+            <polyline points="8 6 2 12 8 18"></polyline>
+        </svg>
+        Generator Tool
+    </a>
+
+    <div class="container">
+        <div class="header">
+            <h1>🗑️ Delete All Fields - Fluent Form Tool</h1>
+            <p>Công cụ xóa sạch tất cả các trường trong form chỉ với một click</p>
+        </div>
+
+        <div class="content">
+            <!-- ULTRA FAST SECTION -->
+            <div class="section section-ultra">
+                <div class="section-title title-ultra">⚡ PHIÊN BẢN ULTRA FAST (CỰC NHANH)</div>
+
+                <div class="instructions">
+                    <strong>Hướng dẫn:</strong>
+                    <ol>
+                        <li>Kéo nút màu đỏ bên dưới vào thanh Bookmark của trình duyệt.</li>
+                        <li>Mở trang chỉnh sửa form Fluent Form.</li>
+                        <li>Click vào bookmark đã lưu. Script sẽ "quét sạch" field trong vài giây.</li>
+                    </ol>
+                </div>
+
+                <div class="bookmarklet-box">
+                    <a href="javascript:(function(){console.log('⚡ ULTRA FAST START');let c=0;const b=setInterval(()=>{const d=document.querySelectorAll('i.ff_icon_btn.el-icon-minus');if(d.length===0){clearInterval(b);console.log('✅ Xong! Đã click '+c+' lần');return}d.forEach(btn=>{try{btn.click();c++}catch(e){}});console.log('🚀 Đã click '+c)},10)})();"
+                        class="bookmarklet-link btn-ultra">🚀 ULTRA FAST DELETE</a>
+                </div>
+
+                <div class="code-container">
+                    <button class="copy-btn" onclick="copyCode('code-ultra')">Copy Code</button>
+                    <code id="code-ultra">// Code xóa cực nhanh (Console)
+(function() {
+    let count = 0;
+    const burst = setInterval(() => {
+        const btns = document.querySelectorAll('i.ff_icon_btn.el-icon-minus');
+        if (btns.length === 0) {
+            clearInterval(burst);
+            console.log('✅ Hoàn thành xóa cực nhanh!'); return;
+        }
+        btns.forEach(b => { try { b.click(); count++; } catch(e){} });
+        console.log(`🚀 Đang dọn dẹp... Đã click ${count} lần`);
+    }, 10);
+})();</code>
+                </div>
+            </div>
+
+            <!-- NORMAL SECTION -->
+            <div class="section section-normal">
+                <div class="section-title title-normal">⭐ PHIÊN BẢN THÔNG THƯỜNG (AN TOÀN)</div>
+
+                <div class="instructions">
+                    <strong>Hướng dẫn:</strong>
+                    <ol>
+                        <li>Kéo nút màu tím bên dưới vào thanh Bookmark.</li>
+                        <li>Click khi ở trang form. Script sẽ xóa lần lượt từng field một cách an toàn.</li>
+                    </ol>
+                </div>
+
+                <div class="bookmarklet-box">
+                    <a href="javascript:(function(){const e=()=>{let t=0;const o=()=>{const n=document.querySelector('i.ff_icon_btn.el-icon-minus');n?(n.click(),t++,console.log(`🗑️ Đã xóa field ${t}`),setTimeout(o,100)):console.log(`✅ Hoàn thành! Đã xóa ${t} field`)};console.log('🚀 Bắt đầu xóa...'),o()};e()})();"
+                        class="bookmarklet-link btn-normal">🗑️ SAFE DELETE</a>
+                </div>
+
+                <div class="code-container">
+                    <button class="copy-btn" onclick="copyCode('code-normal')">Copy Code</button>
+                    <code id="code-normal">// Code xóa an toàn (Console)
+(function() {
+    let count = 0;
+    const deleteNext = () => {
+        const btn = document.querySelector('i.ff_icon_btn.el-icon-minus');
+        if (btn) {
+            btn.click();
+            count++;
+            console.log(`🗑️  Đã xóa field ${count}`);
+            setTimeout(deleteNext, 100);
+        } else {
+            console.log(`✅ Hoàn thành! Đã xóa ${count} field`);
+        }
+    };
+    console.log('🚀 Bắt đầu xóa...');
+    deleteNext();
+})();</code>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ Lưu ý quan trọng:</strong>
+                <p>Hành động này không thể hoàn tác. Vui lòng sao lưu dữ liệu hoặc đảm bảo bạn thực sự muốn xóa toàn bộ
+                    form trước khi thực hiện.</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Phát triển bởi <strong>Tiến Vũ</strong> | <a href="https://witi.vn" target="_blank">witi.vn</a></p>
+        </div>
+    </div>
+
+    <script>
+        function copyCode(id) {
+            const code = document.getElementById(id).textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.querySelector(`button[onclick="copyCode('${id}')"]`);
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Copied!';
+                btn.classList.add('success');
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('success');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+
+</html>
